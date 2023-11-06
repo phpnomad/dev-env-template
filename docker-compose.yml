@@ -1,0 +1,66 @@
+version: '3.1'
+
+services:
+
+    wordpress:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        ports:
+            - 8000:80
+        volumes:
+            - ./tests/phpunit.xml:/var/www/html/tests/phpunit.xml
+            - ./plugins:/var/www/html/wp-content/plugins
+            - ./mu-plugins:/var/www/html/wp-content/mu-plugins
+            - ./tests:/var/www/html/tests
+            - wordpress_files:/var/www/html
+        environment:
+            WORDPRESS_DB_HOST: db
+            WORDPRESS_DB_USER: test
+            WORDPRESS_DB_PASSWORD: test
+            WORDPRESS_DB_NAME: test
+            WORDPRESS_DEBUG: "false"
+            WORDPRESS_CONFIG_EXTRA: |
+                define('WP_DEBUG_DISPLAY', false);
+        depends_on:
+            - db
+        networks:
+            - phpnomad
+
+    db:
+        image: mysql:8.1
+        command: --default-authentication-plugin=mysql_native_password
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: test
+            MYSQL_USER: test
+            MYSQL_PASSWORD: test
+            MYSQL_RANDOM_ROOT_PASSWORD: '1'
+        volumes:
+            - db_data:/var/lib/mysql
+        networks:
+            - phpnomad
+
+    wpcli:
+        image: wordpress:cli
+        volumes:
+            - wordpress_files:/var/www/html
+        depends_on:
+            - wordpress
+        environment:
+            WORDPRESS_DB_HOST: db
+            WORDPRESS_DB_USER: test
+            WORDPRESS_DB_PASSWORD: test
+            WORDPRESS_DB_NAME: test
+        networks:
+            - phpnomad
+        entrypoint: wp
+
+networks:
+    phpnomad:
+        driver: bridge
+
+volumes:
+    wordpress_files:
+    db_data:

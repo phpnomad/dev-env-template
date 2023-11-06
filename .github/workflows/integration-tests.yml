@@ -1,0 +1,40 @@
+name: Integration Tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+        ports:
+          - 8000:8000
+          - 3306:3306
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y docker-compose git composer jq
+      -   name: Set up SSH key
+          run: |
+              mkdir -p ~/.ssh
+              echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+              chmod 600 ~/.ssh/id_rsa
+      -   name: Add GitHub to known hosts
+          run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      -   name: Add SSH key to agent
+          run: |
+              eval $(ssh-agent -s)
+              ssh-add ~/.ssh/id_rsa
+      - name: Clear composer cache
+        run: composer clear-cache
+      - name: Set up environment
+        run: |
+          chmod +x ./setup.sh
+          ./setup.sh --verbose
+      - name: Run Tests
+        run: |
+            ./run-tests.sh

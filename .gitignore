@@ -1,0 +1,5 @@
+plugins
+!plugins/phpnomad
+plugins/phpnomad/lib
+/tests/vendor/
+.idea

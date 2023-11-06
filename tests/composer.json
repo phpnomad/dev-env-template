@@ -1,0 +1,38 @@
+{
+    "name": "phpnomad/test-env",
+    "description": "",
+    "type": "library",
+    "homepage": "https://github.com/phpnomad/test-env",
+    "readme": "README.md",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "php-cs-fixer": "php-cs-fixer fix"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "ssh://git@github.com:22/rooted-phoenix/tests.git"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "phpnomad\\Dev\\Tests\\Integration\\": "Integration"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alex Standiford",
+            "email": "alex@standiford.us"
+        }
+    ],
+    "require": {
+        "phpnomad/tests": "^0"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
+}
